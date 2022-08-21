@@ -18,6 +18,7 @@
 #include "MiLo_RX.h"
 
 #ifdef ESP8266
+    #undef ICACHE_RAM_ATTR
     #define ICACHE_RAM_ATTR IRAM_ATTR
 #endif
 
