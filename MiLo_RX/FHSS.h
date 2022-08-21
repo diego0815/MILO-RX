@@ -13,7 +13,6 @@
 // #define SX1280_FREQ_HZ_TO_REG(f_hz)       ((uint32_t)( (double)f_hz / (double)SX1280_FREQ_STEP ))
 // the pow(x,y) is ugly, and using GHz units is more convenient
 
-
 const uint32_t fhss_freq_list_2p4[] = {
     SX1280_FREQ_GHZ_TO_REG(2.406), // channel 0
     SX1280_FREQ_GHZ_TO_REG(2.407),
