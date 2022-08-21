@@ -1,4 +1,5 @@
 //SBUS driver
+#include <HardwareSerial.h>
 
 #if defined(SBUS)
 	#define SBUS_SYNCBYTE 0x0F 
@@ -17,9 +18,16 @@
 	
 	void init_SBUS()
 	{
-	
-		Serial.begin(100000,SERIAL_8E2,SERIAL_TX_ONLY);
-		USC0(UART0) |= BIT(UCTXI);//inverted signal
+        #ifdef ESP8266
+            Serial.begin(100000,SERIAL_8E2,SERIAL_TX_ONLY);
+       		USC0(UART0) |= BIT(UCTXI);//inverted signal
+        #endif
+        #ifdef ESP32
+            // @todo set Pin RXD = -1;
+            Serial.begin(100000,SERIAL_8E2);
+            // @todo invert Serial
+        #endif
+            
 	
 	}
 	

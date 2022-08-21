@@ -15,21 +15,13 @@
 	along with this code.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-	
-#define ICACHE_RAM_ATTR IRAM_ATTR
-#define WORD_ALIGNED_ATTR __attribute__((aligned(4)))
+#include "MiLo_RX.h"
 
-#include <SPI.h>
-#include "_config.h"
-#include "pins.h"
-#include "iface_sx1280.h"
-#include "FHSS.h"
-#include "SX1280.h"
-
-#ifdef SW_SERIAL
-	#include <SoftwareSerial.h>
-	SoftwareSerial swSer;
+#ifdef ESP8266
+    #define ICACHE_RAM_ATTR IRAM_ATTR
 #endif
+
+#define WORD_ALIGNED_ATTR __attribute__((aligned(4)))
 
 #define RATE_DEFAULT 0 
 #define RATE_BINDING 0  
@@ -40,7 +32,7 @@
 //Failsafe
 #ifdef TX_FAILSAFE
 	bool setFSfromTx = false;
-	bool fsStarted      = false;
+	bool fsStarted   = false;
 	bool fsChanged   = false;
 #endif
 
@@ -157,8 +149,10 @@ MiLo_statistics MiLoStats;
 	#include "Sport_serial.h"
 #endif
 
-#define NOP() __asm__ __volatile__("nop")
-
+#ifdef ESP8266
+    #define NOP() __asm__ __volatile__("nop")
+#endif
+    
 void ICACHE_RAM_ATTR dioISR();
 void SetupTarget(void);
 void ICACHE_RAM_ATTR callSportSerial(void);
@@ -487,8 +481,10 @@ void loop()
 						if(++countUntilWiFi==2)
 						{
 						countUntilWiFi = 0;	
-						timer0_detachInterrupt();//timer0 is needed for wifi
-						startWifiManager();
+                        #ifdef ESP8266
+                            timer0_detachInterrupt();//timer0 is needed for wifi
+                        #endif
+                        startWifiManager();
 						}
 					}
 				}
@@ -909,16 +905,26 @@ void MiLoRxBind(void)
 	void  ConfigTimer()
 	{		
 			noInterrupts();
-			timer0_isr_init();
-			timer0_attachInterrupt(ISR_TIMER4_COMPA);
-			timer0_write(ESP.getCycleCount() +(12000*80));//12ms*(F_CPU/1000000)
+            #ifdef ESP8266
+                timer0_isr_init();
+                timer0_attachInterrupt(ISR_TIMER4_COMPA);
+                timer0_write(ESP.getCycleCount() +(12000*80));//12ms*(F_CPU/1000000)
+            #endif
+            #ifdef ESP32
+                // @todo fill stub
+            #endif
 			interrupts();	 	   	  		
 	}
 	
 	void  ICACHE_RAM_ATTR ISR_TIMER4_COMPA()
 	{		
-			timer0_write(ESP.getCycleCount() +(12000*80));//12ms
-
+        #ifdef ESP8266
+            timer0_write(ESP.getCycleCount() +(12000*80));//12ms
+    #endif
+    #ifdef ESP32
+        // @todo fill stub
+    #endif
+        
 		if(sportMSPframe)
 		{
 			memcpy((void *)TxData, sportMSPdatastuff, idxs);
